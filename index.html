@@ -95,8 +95,6 @@
         .status-dot { width: 8px; height: 8px; background: #10B981; border-radius: 50%; box-shadow: 0 0 10px #10B981; animation: pulse-dot 2s infinite; }
         @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
-        #progress-bar { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary)); width: 0%; z-index: 1001; }
-
         .glass {
             background: var(--glass-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
             border: 1px solid var(--glass-border); border-radius: 24px; box-shadow: var(--glass-shadow);
@@ -125,7 +123,7 @@
         .hero-title { font-size: clamp(3rem, 6vw, 6rem); font-weight: 900; line-height: 1.1; margin: 15px 0 30px; color: var(--text-main); text-shadow: 0 0 20px rgba(255,255,255,0.1); }
         .hero-subtitle { font-size: 1.5rem; color: var(--accent-primary); font-family: var(--font-mono); letter-spacing: 1px; margin-bottom: 40px; }
         .hero-actions { display: flex; gap: 20px; }
-        .resume-btn { font-size: 1.1rem; padding: 15px 35px; background: var(--text-main); color: var(--bg-dark); border-radius: 4px; font-weight: 700; transition: var(--transition-fast); display: inline-block; border: none; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 1px; }
+        .resume-btn { font-size: 1.1rem; padding: 15px 35px; background: var(--text-main); color: var(--bg-dark); border-radius: 4px; font-weight: 700; transition: var(--transition-fast); display: inline-block; border: none; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 1px; text-align: center; }
         .resume-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(255,255,255,0.2); background: var(--accent-primary); color: #000; }
         .btn-outline { background: transparent; border: 1px solid var(--text-main); color: var(--text-main); }
         .btn-outline:hover { background: rgba(255,255,255,0.1); box-shadow: none; border-color: var(--accent-primary); color: var(--accent-primary); }
@@ -138,18 +136,23 @@
         .github-chart { width: 100%; margin-top: 40px; text-align: center; padding: 30px; }
         .github-chart img { width: 100%; max-width: 900px; border-radius: 6px; filter: drop-shadow(0 0 15px rgba(39, 201, 63, 0.15)); }
 
-        .project-scene { width: 100%; margin-bottom: 60px; display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: center; }
+        .project-scene { width: 100%; margin-bottom: 60px; display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: flex-start; }
         .project-scene:last-child { margin-bottom: 0; }
         @media (max-width: 1024px) { .project-scene { grid-template-columns: 1fr; } }
-        .project-content h3 { font-size: 2.5rem; margin-bottom: 20px; line-height: 1.2; color: var(--text-main); }
-        .project-content p { font-size: 1.05rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6; }
+        .project-content h3 { font-size: 2.2rem; margin-bottom: 20px; line-height: 1.2; color: var(--text-main); }
+        
+        /* New Project Details Styling */
+        .project-details { font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px; }
+        .project-details p { margin-bottom: 12px; }
+        .project-details strong { color: var(--accent-primary); font-family: var(--font-mono); text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; }
+
         .tech-stack { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px; }
         .tech-tag { padding: 6px 14px; border: 1px solid var(--glass-border); border-radius: 4px; font-size: 0.75rem; color: var(--text-main); background: rgba(255,255,255,0.05); font-family: var(--font-mono); }
         .github-link { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: 0.9rem; color: var(--text-main); padding: 10px 20px; border-radius: 4px; border: 1px solid var(--glass-border); transition: var(--transition-fast); background: var(--bg-darker); }
         .github-link:hover { background: var(--accent-primary); color: var(--bg-darker); border-color: var(--accent-primary); }
         .github-link svg { width: 20px; height: 20px; fill: currentColor; }
-        .project-visual { height: 400px; border-radius: 12px; position: relative; overflow: hidden; border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow); }
-        .project-visual img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.8) contrast(1.1); transition: transform 0.5s; }
+        .project-visual { height: 100%; min-height: 400px; border-radius: 12px; position: relative; overflow: hidden; border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow); }
+        .project-visual img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.8) contrast(1.1); transition: transform 0.5s; position: absolute; top:0; left:0;}
         .project-visual:hover img { transform: scale(1.05); filter: brightness(1); }
 
         .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; width: 100%; max-width: 1200px; margin: 0 auto; }
@@ -172,11 +175,19 @@
         .timeline-item::before { content: ''; position: absolute; left: -47px; top: 30px; width: 12px; height: 12px; border-radius: 50%; background: var(--accent-primary); box-shadow: 0 0 15px var(--accent-primary); }
         .timeline-year { font-size: 1rem; color: var(--accent-primary); margin-bottom: 8px; font-weight: 700; font-family: var(--font-mono); }
         .timeline-title { font-size: 1.6rem; margin-bottom: 5px; color: var(--text-main); }
-        .timeline-company { font-size: 1.1rem; color: var(--accent-secondary); margin-bottom: 15px; font-weight: 600; }
+        
+        .timeline-company { font-size: 1.1rem; color: var(--accent-secondary); margin-bottom: 15px; font-weight: 600; display: inline-block; transition: var(--transition-fast); text-decoration: underline; text-decoration-color: transparent; }
+        .timeline-company:hover { color: var(--accent-primary); text-decoration-color: var(--accent-primary); }
+        
         .timeline-desc { color: var(--text-muted); line-height: 1.6; font-size: 1rem; }
 
         #ch11-contact { text-align: center; }
         .contact-title { font-size: clamp(3rem, 6vw, 6rem); font-weight: 900; line-height: 1.1; margin-bottom: 40px; color: var(--text-main); }
+        
+        /* Contact info styling */
+        .contact-info-link { display: block; font-size: 1.2rem; color: var(--text-muted); margin-bottom: 10px; font-family: var(--font-mono); transition: var(--transition-fast); }
+        .contact-info-link:hover { color: var(--accent-primary); text-shadow: 0 0 10px rgba(245, 158, 11, 0.3); }
+
         .social-links { display: flex; justify-content: center; gap: 30px; margin-top: 40px; flex-wrap: wrap; }
         .social-link { font-size: 1.1rem; color: var(--text-muted); transition: var(--transition-fast); text-transform: uppercase; letter-spacing: 2px; font-family: var(--font-mono); }
         .social-link:hover { color: var(--accent-primary); text-shadow: 0 0 10px var(--accent-primary); }
@@ -208,6 +219,7 @@
             .main-nav { display: none; }
             .hero-title { font-size: 3rem; }
             .terminal-body { padding: 30px; }
+            .project-visual { min-height: 250px; }
         }
     </style>
 </head>
@@ -230,7 +242,7 @@
         <div class="controls">
             <div class="status-badge"><div class="status-dot"></div> Open to Work</div>
             <button class="ctrl-btn magnetic" id="theme-toggle" title="Toggle Light/Dark Mode">☀️</button>
-            <button class="ctrl-btn recruiter-btn magnetic" onclick="toggleRecruiterMode()">Cinematic Mode</button>
+            <button class="ctrl-btn recruiter-btn magnetic" onclick="toggleRecruiterMode()">Cinematic</button>
         </div>
     </header>
 
@@ -283,31 +295,46 @@
 
         <section class="chapter" id="ch4-projects">
             <div style="margin-bottom: 80px;"><h2 class="reveal" style="font-size: 1rem; letter-spacing: 5px; color: var(--accent-secondary); text-transform: uppercase; font-family: var(--font-mono);">Deployed Systems</h2></div>
+            
             <div class="project-scene reveal">
                 <div class="project-content">
                     <h3>API Testing & Request Platform</h3>
-                    <p>Built a developer-focused API testing platform supporting 4+ HTTP methods, custom headers, and structured JSON payload execution.</p>
-                    <p>Reduced repetitive API testing effort by implementing request history, saved collections, and reusable workflows. Standardized deployment using Docker containerization.</p>
+                    <div class="project-details">
+                        <p><strong>The Problem:</strong> Developers lacked a lightweight, unified web platform for testing APIs on the fly without downloading heavy desktop clients.</p>
+                        <p><strong>Solution Proposed:</strong> Built a comprehensive web-based API tester supporting major HTTP methods, custom headers, and structured JSON payload execution.</p>
+                        <p><strong>Challenges:</strong> Managing complex state for nested JSON payloads and dynamically bypassing browser CORS restrictions for external endpoints.</p>
+                        <p><strong>How I Tackled Them:</strong> Implemented robust React state management for modular payload inputs and deployed a Dockerized Node.js proxy server to seamlessly handle CORS headers during execution.</p>
+                    </div>
                     <div class="tech-stack"><span class="tech-tag">React.js</span> <span class="tech-tag">Node.js</span> <span class="tech-tag">Express.js</span> <span class="tech-tag">Docker</span></div>
                     <a href="https://github.com/ParthMulik" class="github-link magnetic" target="_blank"><svg viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg> View Repository</a>
                 </div>
                 <div class="project-visual tilt-card"><img src="https://images.unsplash.com/photo-1555949963-aa79dcee981c?auto=format&fit=crop&q=80&w=800" alt="API Platform Architecture"></div>
             </div>
+            
             <div class="project-scene reveal">
                 <div class="project-visual tilt-card"><img src="https://images.unsplash.com/photo-1542831371-29b0f74f9713?auto=format&fit=crop&q=80&w=800" alt="Code Editor"></div>
                 <div class="project-content">
                     <h3>Real-Time Collaborative Editor</h3>
-                    <p>A real-time collaborative coding platform enabling multiple users to join shared rooms and edit code simultaneously through low-latency WebSocket synchronization.</p>
-                    <p>Designed a scalable event-driven Node.js backend to support concurrent real-time editing sessions with presence tracking and syntax highlighting.</p>
+                    <div class="project-details">
+                        <p><strong>The Problem:</strong> Remote developers needed a fast, low-latency environment to write and review code together simultaneously without facing merge conflicts.</p>
+                        <p><strong>Solution Proposed:</strong> Developed a collaborative web editor enabling multiple users to join shared instances with real-time synchronization and syntax highlighting.</p>
+                        <p><strong>Challenges:</strong> Handling concurrent edits that overwrite each other (race conditions) and maintaining stable connections across varying networks.</p>
+                        <p><strong>How I Tackled Them:</strong> Implemented operational transformation logic via Socket.io to resolve conflicts instantly, and engineered a heartbeat mechanism in the Node.js backend to recover dropped connections gracefully.</p>
+                    </div>
                     <div class="tech-stack"><span class="tech-tag">WebSockets</span> <span class="tech-tag">Socket.io</span> <span class="tech-tag">CodeMirror</span> <span class="tech-tag">React.js</span></div>
                     <a href="https://github.com/ParthMulik" class="github-link magnetic" target="_blank"><svg viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg> View Repository</a>
                 </div>
             </div>
+            
             <div class="project-scene reveal">
                 <div class="project-content">
                     <h3>AI Compliance Checker</h3>
-                    <p>An AI-powered compliance platform processing 100+ regulatory and contract documents for automated review, clause extraction, and risk identification.</p>
-                    <p>Implemented automated risk flagging and report generation, reducing manual compliance effort by 50%. Integrated email notifications for seamless compliance tracking.</p>
+                    <div class="project-details">
+                        <p><strong>The Problem:</strong> Manual review of lengthy regulatory and corporate contracts is highly error-prone, subjective, and time-consuming.</p>
+                        <p><strong>Solution Proposed:</strong> An AI-powered platform to autonomously extract clauses, validate compliance standards, flag financial risks, and generate automated reports.</p>
+                        <p><strong>Challenges:</strong> Inconsistent document formatting (PDFs vs. Word docs) and maintaining absolute precision in legal contexts where hallucinations are dangerous.</p>
+                        <p><strong>How I Tackled Them:</strong> Integrated robust document parsing libraries in Python and fine-tuned AI prompts to specifically target high-risk legal parameters using a structured, multi-pass validation workflow.</p>
+                    </div>
                     <div class="tech-stack"><span class="tech-tag">AI Models</span> <span class="tech-tag">Document Processing</span> <span class="tech-tag">Python</span></div>
                     <a href="https://github.com/ParthMulik" class="github-link magnetic" target="_blank"><svg viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg> View Repository</a>
                 </div>
@@ -342,20 +369,20 @@
                 <div class="timeline-item">
                     <div class="timeline-year">Present (Jun 2026 - Jul 2026) • Onsite, Mumbai</div>
                     <h3 class="timeline-title">Software Development Engineer Intern</h3>
-                    <div class="timeline-company">Transformhub</div>
+                    <a href="https://www.linkedin.com/company/transformhub/" target="_blank" class="timeline-company">Transformhub</a>
                     <p class="timeline-desc">Building and optimizing scalable software solutions, contributing to core product infrastructure and enhancing system performance.</p>
                 </div>
                 <div class="timeline-item">
                     <div class="timeline-year">Present (Jun 2026 - Jul 2026) • Remote</div>
                     <h3 class="timeline-title">Summer Research & Development Intern</h3>
-                    <div class="timeline-company">RV University</div>
+                    <a href="https://www.linkedin.com/school/rv-university/" target="_blank" class="timeline-company">RV University</a>
                     <p class="timeline-desc">Engaged in rigorous technical research and development, building prototypes and contributing to academic-level engineering projects.</p>
                 </div>
                 <div class="timeline-item">
                     <div class="timeline-year">Aug 2025 - Oct 2025 • Remote</div>
                     <h3 class="timeline-title">AI Intern</h3>
-                    <div class="timeline-company">Infosys Springboard</div>
-                    <p class="timeline-desc">Developed AI application modules by translating requirements into workflows. Improved application reliability through debugging, output validation, and core logic refinement across multiple AI-driven feature modules. Strengthened overall system stability.</p>
+                    <a href="https://www.linkedin.com/showcase/infosys-springboard/" target="_blank" class="timeline-company">Infosys Springboard</a>
+                    <p class="timeline-desc">I worked on an AI-powered regulatory compliance checker for contracts project. Developed AI application modules by translating requirements into workflows, improved application reliability through debugging, and refined core logic across multiple AI-driven feature modules.</p>
                 </div>
             </div>
         </section>
@@ -363,19 +390,19 @@
         <section class="chapter" id="ch11-contact">
             <h1 class="contact-title reveal">LET'S BUILD SOMETHING IMPACTFUL.</h1>
             <div class="reveal" style="transition-delay: 0.2s;">
-                <p style="font-size: 1.2rem; color: var(--text-muted); margin-bottom: 10px; font-family: var(--font-mono);">parthmulik36@gmail.com</p>
-                <p style="font-size: 1.2rem; color: var(--text-muted); margin-bottom: 10px; font-family: var(--font-mono);">+91 9130314018</p>
-                <p style="font-size: 1.2rem; color: var(--text-muted); font-family: var(--font-mono);">Kolhapur, Maharashtra, India</p>
+                <a href="mailto:parthmulik36@gmail.com" class="contact-info-link magnetic">parthmulik36@gmail.com</a>
+                <a href="tel:+919130314018" class="contact-info-link magnetic">+91 9130314018</a>
+                <a href="https://maps.google.com/?q=Kolhapur,Maharashtra,India" target="_blank" class="contact-info-link magnetic">Kolhapur, Maharashtra, India</a>
             </div>
             <ul class="social-links reveal" style="transition-delay: 0.3s;">
                 <li><a href="https://github.com/ParthMulik" class="social-link magnetic" target="_blank">GitHub</a></li>
-                <li><a href="#" class="social-link magnetic">LinkedIn</a></li>
-                <li><a href="#" class="social-link magnetic">LeetCode</a></li>
-                <li><a href="#" class="social-link magnetic">CodeChef</a></li>
-                <li><a href="#" class="social-link magnetic">Codolio</a></li>
+                <li><a href="https://www.linkedin.com/in/parth-mulik-87a9a4318/" class="social-link magnetic" target="_blank">LinkedIn</a></li>
+                <li><a href="https://leetcode.com/u/Parth_Mulik/" class="social-link magnetic" target="_blank">LeetCode</a></li>
+                <li><a href="https://www.codechef.com/users/parth_202006" class="social-link magnetic" target="_blank">CodeChef</a></li>
+                <li><a href="https://codolio.com/profile/Parth_Mulik" class="social-link magnetic" target="_blank">Codolio</a></li>
             </ul>
             <div class="reveal" style="transition-delay: 0.4s; margin-top: 50px;">
-                <button class="resume-btn magnetic" onclick="alert('Downloading Resume.pdf...')">Download Resume</button>
+                <a href="https://drive.google.com/file/d/1IP93Nn675GxEFTvBqySaPN8WT7bla16n/view?usp=sharing" target="_blank" class="resume-btn magnetic">Resume</a>
             </div>
         </section>
     </main>
@@ -600,7 +627,7 @@
             },
             {
                 keywords: ['intern', 'internship', 'infosys', 'experience', 'worked'],
-                response: "Parth worked as an AI Intern at Infosys Springboard. He worked on AI-driven workflows, debugging, testing, feature enhancements, optimization, and improving application reliability and performance."
+                response: "Parth worked as an AI Intern at Infosys Springboard. He worked on an AI-powered regulatory compliance checker for contracts project, handling workflows, debugging, testing, feature enhancements, optimization, and improving application reliability and performance."
             },
             {
                 keywords: ['ai experience', 'artificial intelligence', 'machine learning', 'ml'],
@@ -640,11 +667,11 @@
             },
             {
                 keywords: ['resume', 'cv', 'download'],
-                response: "You can download Parth's resume using the Resume button available throughout the website."
+                response: "You can open and download Parth's resume using the Resume button available at the bottom of the page."
             },
             {
                 keywords: ['github', 'linkedin', 'coding profiles', 'geeksforgeeks', 'profiles', 'links'],
-                response: "You can access Parth's GitHub, LinkedIn, LeetCode, CodeChef, and GeeksforGeeks profiles through the links available in the Contact and Coding Profiles sections of the portfolio."
+                response: "You can access Parth's GitHub, LinkedIn, LeetCode, CodeChef, and Codolio profiles through the links available in the Contact section of the portfolio."
             },
             {
                 keywords: ['hi', 'hello', 'hey', 'greetings', 'morning', 'evening'],
@@ -657,18 +684,15 @@
         function getAIResponse(userQuery) {
             const lowerQ = userQuery.toLowerCase();
             
-            // Priority Exact Match Check for Introductions
             if (lowerQ.includes('who is parth') || lowerQ.includes('tell me about parth') || lowerQ.includes('introduce yourself')) {
                 return intentEngine[0].response;
             }
 
-            // Loop through knowledge base
             for (const intent of intentEngine) {
                 if (intent.keywords.some(kw => lowerQ.includes(kw))) {
                     return intent.response;
                 }
             }
-            // Strict Fallback (No Hallucination)
             return fallbackResponse;
         }
 
@@ -712,10 +736,10 @@
             document.body.classList.toggle('recruiter-mode');
             const btn = document.querySelector('.recruiter-btn');
             if(document.body.classList.contains('recruiter-mode')) {
-                btn.textContent = "Default Mode";
+                btn.textContent = "Default";
                 speakText("Cinematic tech mode engaged. Colors switched to high-contrast cyan and purple.");
             } else {
-                btn.textContent = "Cinematic Mode";
+                btn.textContent = "Cinematic";
                 speakText("Default mode restored. Highlighting core engineering metrics with an Amber aesthetic.");
             }
         }
