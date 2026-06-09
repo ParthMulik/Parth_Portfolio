@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PARTH MULIK | Engineering Experiences</title>
+    <style>
+        /* ==========================================================================
+           1. CSS VARIABLES & THEMES
+           ========================================================================== */
+        :root {
+            --bg-dark: #111827;
+            --bg-darker: #0B0F19;
+            --accent-primary: #F59E0B;
+            --accent-secondary: #3B82F6;
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+            --glass-bg: rgba(17, 24, 39, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+            --transition-slow: all 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+            --transition-fast: all 0.3s ease;
+        }
+
+        body.light-mode {
+            --bg-dark: #F1F5F9;
+            --bg-darker: #E2E8F0;
+            --accent-primary: #0284C7;
+            --accent-secondary: #7C3AED;
+            --text-main: #0F172A;
+            --text-muted: #475569;
+            --glass-bg: rgba(255, 255, 255, 0.6);
+            --glass-border: rgba(0, 0, 0, 0.1);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        body.recruiter-mode {
+            --bg-dark: #070B14;
+            --bg-darker: #04060A;
+            --accent-primary: #00E5FF;
+            --accent-secondary: #9D4EDD;
+            --glass-bg: rgba(11, 16, 32, 0.5);
+        }
+
+        /* ==========================================================================
+           2. RESET & BASE STYLES
+           ========================================================================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
+        html { scroll-behavior: smooth; }
+        body {
+            background-color: var(--bg-dark); color: var(--text-main);
+            font-family: var(--font-sans); overflow-x: hidden;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+        a { color: var(--accent-primary); text-decoration: none; }
+        ul { list-style: none; }
+
+        /* ==========================================================================
+           3. GLOBAL COMPONENTS
+           ========================================================================== */
+        #cursor, #cursor-glow {
+            position: fixed; top: 0; left: 0; pointer-events: none;
+            border-radius: 50%; transform: translate(-50%, -50%); z-index: 9999;
+            will-change: left, top;
+        }
+        #cursor { width: 4px; height: 4px; background: var(--text-main); }
+        #cursor-glow { width: 14px; height: 14px; border: 1px solid var(--accent-primary); box-shadow: 0 0 5px var(--accent-primary); opacity: 0.8; }
+        #bg-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; }
+
+        header {
+            position: fixed; top: 0; left: 0; width: 100%; padding: 20px 40px;
+            display: flex; justify-content: space-between; align-items: center; z-index: 1000;
+        }
+        .logo { font-weight: 900; letter-spacing: 3px; font-size: 1.5rem; color: var(--text-main); }
+        .main-nav {
+            display: flex; gap: 20px; background: var(--glass-bg); padding: 10px 25px;
+            border-radius: 40px; border: 1px solid var(--glass-border); backdrop-filter: blur(10px);
+        }
+        .main-nav a { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-main); font-weight: 500; transition: var(--transition-fast); }
+        .main-nav a:hover { color: var(--accent-primary); }
+
+        .controls { display: flex; gap: 15px; align-items: center; }
+        .ctrl-btn {
+            background: var(--glass-bg); color: var(--text-main); border: 1px solid var(--glass-border);
+            padding: 8px 16px; border-radius: 20px; font-size: 0.8rem; text-transform: uppercase;
+            letter-spacing: 1px; transition: var(--transition-fast); backdrop-filter: blur(10px);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .ctrl-btn:hover { background: var(--text-main); color: var(--bg-dark); }
+        
+        .status-badge { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono); }
+        .status-dot { width: 8px; height: 8px; background: #10B981; border-radius: 50%; box-shadow: 0 0 10px #10B981; animation: pulse-dot 2s infinite; }
+        @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+        #progress-bar { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary)); width: 0%; z-index: 1001; }
+
+        .glass {
+            background: var(--glass-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border); border-radius: 24px; box-shadow: var(--glass-shadow);
+            transition: transform 0.1s; transform-style: preserve-3d;
+        }
+        .magnetic { display: inline-block; transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1); }
+
+        /* ==========================================================================
+           4. CHAPTER LAYOUTS
+           ========================================================================== */
+        .chapter { display: flex; flex-direction: column; justify-content: center; padding: 60px 10%; position: relative; scroll-margin-top: 120px; }
+        #ch1-hero { min-height: 100vh; padding-top: 150px; }
+        .reveal { opacity: 0; transform: translateY(40px); transition: var(--transition-slow); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        #ch1-hero { align-items: center; text-align: center; }
+        .hero-terminal { width: 100%; max-width: 900px; text-align: left; overflow: hidden; padding: 0; }
+        .terminal-header { background: rgba(0, 0, 0, 0.4); padding: 12px 20px; display: flex; align-items: center; border-bottom: 1px solid var(--glass-border); }
+        .terminal-header .dot { width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }
+        .dot.close { background: #FF5F56; } .dot.min { background: #FFBD2E; } .dot.max { background: #27C93F; }
+        .term-title { margin: 0 auto; transform: translateX(-24px); font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted); }
+        .terminal-body { padding: 50px; }
+        .cmd-line { font-family: var(--font-mono); font-size: 1.1rem; color: var(--text-muted); margin-bottom: 15px; display: flex; align-items: center; }
+        .prompt { color: #27C93F; font-weight: bold; margin-right: 12px; }
+        .dir { color: var(--accent-secondary); margin-right: 12px; }
+        .hero-title { font-size: clamp(3rem, 6vw, 6rem); font-weight: 900; line-height: 1.1; margin: 15px 0 30px; color: var(--text-main); text-shadow: 0 0 20px rgba(255,255,255,0.1); }
+        .hero-subtitle { font-size: 1.5rem; color: var(--accent-primary); font-family: var(--font-mono); letter-spacing: 1px; margin-bottom: 40px; }
+        .hero-actions { display: flex; gap: 20px; }
+        .resume-btn { font-size: 1.1rem; padding: 15px 35px; background: var(--text-main); color: var(--bg-dark); border-radius: 4px; font-weight: 700; transition: var(--transition-fast); display: inline-block; border: none; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 1px; }
+        .resume-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(255,255,255,0.2); background: var(--accent-primary); color: #000; }
+        .btn-outline { background: transparent; border: 1px solid var(--text-main); color: var(--text-main); }
+        .btn-outline:hover { background: rgba(255,255,255,0.1); box-shadow: none; border-color: var(--accent-primary); color: var(--accent-primary); }
+
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; width: 100%; }
+        .metric-card { text-align: left; padding: 30px; }
+        .metric-value { font-size: 3rem; font-weight: 800; background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; line-height: 1.1; }
+        .metric-label { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-main); font-weight: 600; }
+        .metric-detail { font-size: 0.8rem; color: var(--text-muted); margin-top: 10px; font-family: var(--font-mono); }
+        .github-chart { width: 100%; margin-top: 40px; text-align: center; padding: 30px; }
+        .github-chart img { width: 100%; max-width: 900px; border-radius: 6px; filter: drop-shadow(0 0 15px rgba(39, 201, 63, 0.15)); }
+
+        .project-scene { width: 100%; margin-bottom: 60px; display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: center; }
+        .project-scene:last-child { margin-bottom: 0; }
+        @media (max-width: 1024px) { .project-scene { grid-template-columns: 1fr; } }
+        .project-content h3 { font-size: 2.5rem; margin-bottom: 20px; line-height: 1.2; color: var(--text-main); }
+        .project-content p { font-size: 1.05rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6; }
+        .tech-stack { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px; }
+        .tech-tag { padding: 6px 14px; border: 1px solid var(--glass-border); border-radius: 4px; font-size: 0.75rem; color: var(--text-main); background: rgba(255,255,255,0.05); font-family: var(--font-mono); }
+        .github-link { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: 0.9rem; color: var(--text-main); padding: 10px 20px; border-radius: 4px; border: 1px solid var(--glass-border); transition: var(--transition-fast); background: var(--bg-darker); }
+        .github-link:hover { background: var(--accent-primary); color: var(--bg-darker); border-color: var(--accent-primary); }
+        .github-link svg { width: 20px; height: 20px; fill: currentColor; }
+        .project-visual { height: 400px; border-radius: 12px; position: relative; overflow: hidden; border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow); }
+        .project-visual img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.8) contrast(1.1); transition: transform 0.5s; }
+        .project-visual:hover img { transform: scale(1.05); filter: brightness(1); }
+
+        .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; width: 100%; max-width: 1200px; margin: 0 auto; }
+        .skill-category { padding: 30px; }
+        .category-title { font-size: 1rem; color: var(--accent-secondary); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; font-family: var(--font-mono); }
+        .skills-wrapper { display: flex; flex-wrap: wrap; gap: 10px; }
+        .skill-node { padding: 8px 16px; border-radius: 4px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); font-size: 0.9rem; color: var(--text-main); transition: var(--transition-fast); }
+        .skill-node:hover { background: var(--accent-primary); color: #000; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(245,158,11,0.3); border-color: transparent; }
+
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .achievement-monument { position: relative; padding: 50px 30px; text-align: center; overflow: hidden; border-radius: 12px; }
+        .achievement-monument::before { content: ''; position: absolute; top: -50%; left: 50%; transform: translateX(-50%); width: 80px; height: 80px; background: var(--accent-secondary); filter: blur(60px); opacity: 0.2; transition: var(--transition-slow); }
+        .achievement-monument:hover::before { opacity: 0.6; top: 0; }
+        .achievement-monument h3 { font-size: 1.5rem; margin-bottom: 15px; z-index: 1; position: relative; color: var(--text-main); }
+        .achievement-monument p { color: var(--text-muted); line-height: 1.6; z-index: 1; position: relative; font-size: 0.95rem; }
+
+        .timeline { position: relative; max-width: 900px; margin: 0 auto; border-left: 2px solid var(--glass-border); padding-left: 40px; }
+        .timeline-item { background: var(--glass-bg); backdrop-filter: blur(16px); border: 1px solid var(--glass-border); border-radius: 12px; padding: 30px; margin-bottom: 40px; position: relative; box-shadow: var(--glass-shadow); transition: var(--transition-fast); }
+        .timeline-item:hover { transform: translateY(-5px); border-color: var(--accent-primary); }
+        .timeline-item::before { content: ''; position: absolute; left: -47px; top: 30px; width: 12px; height: 12px; border-radius: 50%; background: var(--accent-primary); box-shadow: 0 0 15px var(--accent-primary); }
+        .timeline-year { font-size: 1rem; color: var(--accent-primary); margin-bottom: 8px; font-weight: 700; font-family: var(--font-mono); }
+        .timeline-title { font-size: 1.6rem; margin-bottom: 5px; color: var(--text-main); }
+        .timeline-company { font-size: 1.1rem; color: var(--accent-secondary); margin-bottom: 15px; font-weight: 600; }
+        .timeline-desc { color: var(--text-muted); line-height: 1.6; font-size: 1rem; }
+
+        #ch11-contact { text-align: center; }
+        .contact-title { font-size: clamp(3rem, 6vw, 6rem); font-weight: 900; line-height: 1.1; margin-bottom: 40px; color: var(--text-main); }
+        .social-links { display: flex; justify-content: center; gap: 30px; margin-top: 40px; flex-wrap: wrap; }
+        .social-link { font-size: 1.1rem; color: var(--text-muted); transition: var(--transition-fast); text-transform: uppercase; letter-spacing: 2px; font-family: var(--font-mono); }
+        .social-link:hover { color: var(--accent-primary); text-shadow: 0 0 10px var(--accent-primary); }
+
+        /* ==========================================================================
+           5. AI ASSISTANT OVERLAY
+           ========================================================================== */
+        #ai-assistant { position: fixed; bottom: 40px; right: 40px; z-index: 2000; }
+        .ai-orb { 
+            width: 45px; height: 45px; 
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.4); 
+            animation: pulse-glow 3s infinite alternate; 
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        }
+        .ai-orb:hover { transform: scale(1.15) rotate(15deg); }
+        @keyframes pulse-glow { 0% { filter: drop-shadow(0 0 10px rgba(245,158,11,0.5)); opacity: 0.9; } 100% { filter: drop-shadow(0 0 25px rgba(59,130,246,0.8)); opacity: 1; } }
+        #ai-panel { position: absolute; bottom: 70px; right: 0; width: 320px; padding: 20px; border-radius: 16px; display: none; opacity: 0; transform: translateY(20px); transition: var(--transition-fast); transform-origin: bottom right; }
+        #ai-panel.active { display: block; opacity: 1; transform: translateY(0); }
+        .ai-chat-log { height: 250px; overflow-y: auto; margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; padding-right: 5px; }
+        .ai-msg { padding: 10px 15px; border-radius: 8px; font-size: 0.9rem; line-height: 1.4; max-width: 85%; color: var(--text-main); font-family: var(--font-sans); }
+        .ai-msg.bot { background: rgba(245,158,11,0.15); border-left: 2px solid var(--accent-primary); align-self: flex-start; }
+        .ai-msg.user { background: rgba(255,255,255,0.1); border-right: 2px solid var(--accent-secondary); align-self: flex-end; }
+        .ai-input { width: 100%; background: var(--bg-dark); border: 1px solid var(--glass-border); padding: 12px; border-radius: 4px; color: var(--text-main); outline: none; font-family: var(--font-mono); }
+        .ai-input:focus { border-color: var(--accent-primary); }
+
+        @media (max-width: 900px) {
+            .main-nav { display: none; }
+            .hero-title { font-size: 3rem; }
+            .terminal-body { padding: 30px; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+    <div id="progress-bar"></div>
+    <div id="cursor"></div>
+    <div id="cursor-glow"></div>
+
+    <header>
+        <div class="logo">PARTH</div>
+        <nav class="main-nav">
+            <a href="#ch3-dashboard" class="magnetic">Overview</a>
+            <a href="#ch4-projects" class="magnetic">Projects</a>
+            <a href="#ch5-skills" class="magnetic">Skills</a>
+            <a href="#ch8-experience" class="magnetic">Experience</a>
+            <a href="#ch11-contact" class="magnetic">Contact</a>
+        </nav>
+        <div class="controls">
+            <div class="status-badge"><div class="status-dot"></div> Open to Work</div>
+            <button class="ctrl-btn magnetic" id="theme-toggle" title="Toggle Light/Dark Mode">☀️</button>
+            <button class="ctrl-btn recruiter-btn magnetic" onclick="toggleRecruiterMode()">Cinematic Mode</button>
+        </div>
+    </header>
+
+    <div id="ai-assistant">
+        <div id="ai-panel" class="glass">
+            <div style="font-size: 0.8rem; color: var(--accent-secondary); margin-bottom: 10px; font-family: var(--font-mono); text-transform: uppercase;">PARTH.AI Assistant</div>
+            <div class="ai-chat-log" id="ai-chat-log">
+                <div class="ai-msg bot" id="ai-greeting">Initializing...</div>
+            </div>
+            <input type="text" class="ai-input" id="ai-input" placeholder="Ask about Parth...">
+        </div>
+        <div class="ai-orb magnetic" id="ai-orb" title="Chat with AI Guide"></div>
+    </div>
+
+    <main>
+        <section class="chapter" id="ch1-hero">
+            <div class="hero-terminal glass tilt-card reveal">
+                <div class="terminal-header">
+                    <span class="dot close"></span><span class="dot min"></span><span class="dot max"></span>
+                    <span class="term-title">bash - parth@engineer:~</span>
+                </div>
+                <div class="terminal-body">
+                    <div class="cmd-line"><span class="prompt">$</span> <span class="dir">~/portfolio</span> whoami</div>
+                    <h1 class="hero-title">PARTH MULIK</h1>
+                    <div class="cmd-line" style="margin-top: 10px;"><span class="prompt">$</span> <span class="dir">~/portfolio</span> cat current_role.txt</div>
+                    <div class="hero-subtitle"><span id="hero-typewriter"></span><span style="animation: blink 1s infinite;">|</span></div>
+                    <div class="hero-actions">
+                        <a href="#ch4-projects" class="resume-btn magnetic">./view_projects.sh</a>
+                        <a href="#ch11-contact" class="resume-btn btn-outline magnetic">--contact</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="chapter" id="ch3-dashboard">
+            <h2 class="reveal" style="font-size: 2rem; margin-bottom: 50px; font-weight: 300;">Overview</h2>
+            <div class="dashboard-grid">
+                <div class="glass metric-card reveal tilt-card"><div class="metric-value">9.20</div><div class="metric-label">System CGPA</div><div class="metric-detail">VIT Bhopal University (B.Tech ECE)</div></div>
+                <div class="glass metric-card reveal tilt-card" style="transition-delay: 0.1s;"><div class="metric-value">300+</div><div class="metric-label">Problems Solved</div><div class="metric-detail">Algorithmic rigor on LeetCode & CodeChef</div></div>
+                <div class="glass metric-card reveal tilt-card" style="transition-delay: 0.2s;"><div class="metric-value">2</div><div class="metric-label">Hackathon Wins</div><div class="metric-detail">Outperforming 500+ competing teams</div></div>
+                <div class="glass metric-card reveal tilt-card" style="transition-delay: 0.3s;"><div class="metric-value">Top 10</div><div class="metric-label">Academic Rank</div><div class="metric-detail">Top 10 student in ECE branch</div></div>
+                <div class="glass metric-card reveal tilt-card" style="transition-delay: 0.4s;"><div class="metric-value" style="font-size: 2.5rem;">Tech Lead</div><div class="metric-label">Marathi Club</div><div class="metric-detail">Managing engineering implementations</div></div>
+                <div class="glass metric-card reveal tilt-card" style="transition-delay: 0.5s;"><div class="metric-value" style="font-size: 2.5rem;">Resource Lead</div><div class="metric-label">Insights Club</div><div class="metric-detail">Architecting structural resources</div></div>
+            </div>
+            <div class="github-chart glass reveal tilt-card" style="margin-top: 50px;">
+                <h3 style="margin-bottom: 20px; color: var(--text-main); text-align: left; font-size: 1.2rem; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 2px;">$ git log --stat</h3>
+                <img src="https://ghchart.rshah.org/ParthMulik" alt="Parth's GitHub Contributions" />
+            </div>
+        </section>
+
+        <section class="chapter" id="ch4-projects">
+            <div style="margin-bottom: 80px;"><h2 class="reveal" style="font-size: 1rem; letter-spacing: 5px; color: var(--accent-secondary); text-transform: uppercase; font-family: var(--font-mono);">Deployed Systems</h2></div>
+            <div class="project-scene reveal">
+                <div class="project-content">
+                    <h3>API Testing & Request Platform</h3>
+                    <p>Built a developer-focused API testing platform supporting 4+ HTTP methods, custom headers, and structured JSON payload execution.</p>
+                    <p>Reduced repetitive API testing effort by implementing request history, saved collections, and reusable workflows. Standardized deployment using Docker containerization.</p>
+                    <div class="tech-stack"><span class="tech-tag">React.js</span> <span class="tech-tag">Node.js</span> <span class="tech-tag">Express.js</span> <span class="tech-tag">Docker</span></div>
+                    <a href="https://github.com/ParthMulik" class="github-link magnetic" target="_blank"><svg viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg> View Repository</a>
+                </div>
+                <div class="project-visual tilt-card"><img src="https://images.unsplash.com/photo-1555949963-aa79dcee981c?auto=format&fit=crop&q=80&w=800" alt="API Platform Architecture"></div>
+            </div>
+            <div class="project-scene reveal">
+                <div class="project-visual tilt-card"><img src="https://images.unsplash.com/photo-1542831371-29b0f74f9713?auto=format&fit=crop&q=80&w=800" alt="Code Editor"></div>
+                <div class="project-content">
+                    <h3>Real-Time Collaborative Editor</h3>
+                    <p>A real-time collaborative coding platform enabling multiple users to join shared rooms and edit code simultaneously through low-latency WebSocket synchronization.</p>
+                    <p>Designed a scalable event-driven Node.js backend to support concurrent real-time editing sessions with presence tracking and syntax highlighting.</p>
+                    <div class="tech-stack"><span class="tech-tag">WebSockets</span> <span class="tech-tag">Socket.io</span> <span class="tech-tag">CodeMirror</span> <span class="tech-tag">React.js</span></div>
+                    <a href="https://github.com/ParthMulik" class="github-link magnetic" target="_blank"><svg viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg> View Repository</a>
+                </div>
+            </div>
+            <div class="project-scene reveal">
+                <div class="project-content">
+                    <h3>AI Compliance Checker</h3>
+                    <p>An AI-powered compliance platform processing 100+ regulatory and contract documents for automated review, clause extraction, and risk identification.</p>
+                    <p>Implemented automated risk flagging and report generation, reducing manual compliance effort by 50%. Integrated email notifications for seamless compliance tracking.</p>
+                    <div class="tech-stack"><span class="tech-tag">AI Models</span> <span class="tech-tag">Document Processing</span> <span class="tech-tag">Python</span></div>
+                    <a href="https://github.com/ParthMulik" class="github-link magnetic" target="_blank"><svg viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg> View Repository</a>
+                </div>
+                <div class="project-visual tilt-card"><img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=800" alt="AI Neural Network"></div>
+            </div>
+        </section>
+
+        <section class="chapter" id="ch5-skills">
+            <h2 class="reveal" style="font-size: 2rem; margin-bottom: 50px; text-align: center;">Technology Ecosystem</h2>
+            <div class="skills-grid reveal">
+                <div class="glass skill-category tilt-card"><h3 class="category-title">Languages</h3><div class="skills-wrapper"><div class="skill-node magnetic">C++</div><div class="skill-node magnetic">Python</div><div class="skill-node magnetic">JavaScript</div><div class="skill-node magnetic">SQL</div></div></div>
+                <div class="glass skill-category tilt-card"><h3 class="category-title">Frontend</h3><div class="skills-wrapper"><div class="skill-node magnetic">React.js</div><div class="skill-node magnetic">HTML</div><div class="skill-node magnetic">CSS</div><div class="skill-node magnetic">Responsive UI</div></div></div>
+                <div class="glass skill-category tilt-card"><h3 class="category-title">Backend</h3><div class="skills-wrapper"><div class="skill-node magnetic">Node.js</div><div class="skill-node magnetic">Express.js</div><div class="skill-node magnetic">REST APIs</div><div class="skill-node magnetic">WebSockets</div><div class="skill-node magnetic">Socket.io</div></div></div>
+                <div class="glass skill-category tilt-card"><h3 class="category-title">Databases & Caching</h3><div class="skills-wrapper"><div class="skill-node magnetic">PostgreSQL</div><div class="skill-node magnetic">MySQL</div><div class="skill-node magnetic">Redis</div></div></div>
+                <div class="glass skill-category tilt-card"><h3 class="category-title">DevOps & Tools</h3><div class="skills-wrapper"><div class="skill-node magnetic">Docker</div><div class="skill-node magnetic">Git</div><div class="skill-node magnetic">Linux</div><div class="skill-node magnetic">Postman</div></div></div>
+                <div class="glass skill-category tilt-card"><h3 class="category-title">Core CS</h3><div class="skills-wrapper"><div class="skill-node magnetic">DSA</div><div class="skill-node magnetic">OOP</div><div class="skill-node magnetic">DBMS</div><div class="skill-node magnetic">OS</div><div class="skill-node magnetic">Networks</div></div></div>
+            </div>
+        </section>
+
+        <section class="chapter" id="ch6-achievements">
+            <h2 class="reveal" style="font-size: 2rem; margin-bottom: 50px;">Artifact Gallery</h2>
+            <div class="gallery-grid">
+                <div class="glass achievement-monument reveal tilt-card"><h3>Hackathon Victory</h3><p>Won 2 hackathons among 500+ competing teams by building scalable AI and software engineering solutions.</p></div>
+                <div class="glass achievement-monument reveal tilt-card" style="transition-delay: 0.1s;"><h3>Open Source Contributor</h3><p>Selected as Contributor for GirlScript Summer of Code (GSSOC'26) and Social Summer of Code (SSOC'26).</p></div>
+                <div class="glass achievement-monument reveal tilt-card" style="transition-delay: 0.2s;"><h3>Algorithmic Mastery</h3><p>Solved 300+ advanced algorithmic problems across LeetCode and CodeChef platforms.</p></div>
+            </div>
+        </section>
+
+        <section class="chapter" id="ch8-experience">
+            <h2 class="reveal" style="font-size: 2rem; margin-bottom: 50px;">Professional Experience</h2>
+            <div class="timeline reveal">
+                <div class="timeline-item">
+                    <div class="timeline-year">Present (Jun 2026 - Jul 2026) • Onsite, Mumbai</div>
+                    <h3 class="timeline-title">Software Development Engineer Intern</h3>
+                    <div class="timeline-company">Transformhub</div>
+                    <p class="timeline-desc">Building and optimizing scalable software solutions, contributing to core product infrastructure and enhancing system performance.</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">Present (Jun 2026 - Jul 2026) • Remote</div>
+                    <h3 class="timeline-title">Summer Research & Development Intern</h3>
+                    <div class="timeline-company">RV University</div>
+                    <p class="timeline-desc">Engaged in rigorous technical research and development, building prototypes and contributing to academic-level engineering projects.</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">Aug 2025 - Oct 2025 • Remote</div>
+                    <h3 class="timeline-title">AI Intern</h3>
+                    <div class="timeline-company">Infosys Springboard</div>
+                    <p class="timeline-desc">Developed AI application modules by translating requirements into workflows. Improved application reliability through debugging, output validation, and core logic refinement across multiple AI-driven feature modules. Strengthened overall system stability.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="chapter" id="ch11-contact">
+            <h1 class="contact-title reveal">LET'S BUILD SOMETHING IMPACTFUL.</h1>
+            <div class="reveal" style="transition-delay: 0.2s;">
+                <p style="font-size: 1.2rem; color: var(--text-muted); margin-bottom: 10px; font-family: var(--font-mono);">parthmulik36@gmail.com</p>
+                <p style="font-size: 1.2rem; color: var(--text-muted); margin-bottom: 10px; font-family: var(--font-mono);">+91 9130314018</p>
+                <p style="font-size: 1.2rem; color: var(--text-muted); font-family: var(--font-mono);">Kolhapur, Maharashtra, India</p>
+            </div>
+            <ul class="social-links reveal" style="transition-delay: 0.3s;">
+                <li><a href="https://github.com/ParthMulik" class="social-link magnetic" target="_blank">GitHub</a></li>
+                <li><a href="#" class="social-link magnetic">LinkedIn</a></li>
+                <li><a href="#" class="social-link magnetic">LeetCode</a></li>
+                <li><a href="#" class="social-link magnetic">CodeChef</a></li>
+                <li><a href="#" class="social-link magnetic">Codolio</a></li>
+            </ul>
+            <div class="reveal" style="transition-delay: 0.4s; margin-top: 50px;">
+                <button class="resume-btn magnetic" onclick="alert('Downloading Resume.pdf...')">Download Resume</button>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        /* ==========================================================================
+           1. THEME TOGGLE (DARK / LIGHT MODE)
+           ========================================================================== */
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        let isLightMode = false;
+        themeToggleBtn.addEventListener('click', () => {
+            isLightMode = !isLightMode;
+            document.body.classList.toggle('light-mode', isLightMode);
+            themeToggleBtn.textContent = isLightMode ? '🌙' : '☀️';
+            document.getElementById('cursor').style.background = isLightMode ? '#000' : '#fff';
+        });
+
+        /* ==========================================================================
+           2. CANVAS BACKGROUND
+           ========================================================================== */
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height, nodes = [];
+        function initCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            nodes = [];
+            let count = window.innerWidth > 768 ? 50 : 25;
+            for(let i=0; i<count; i++) {
+                nodes.push({
+                    x: Math.random() * width, y: Math.random() * height,
+                    vx: (Math.random() - 0.5) * 0.5, vy: (Math.random() - 0.5) * 0.5,
+                    size: Math.random() * 2 + 1
+                });
+            }
+        }
+        function drawCanvas() {
+            ctx.clearRect(0, 0, width, height);
+            let isRecruiter = document.body.classList.contains('recruiter-mode');
+            let nodeColor = isRecruiter ? 'rgba(0, 229, 255, 0.4)' : (isLightMode ? 'rgba(2, 132, 199, 0.4)' : 'rgba(245, 158, 11, 0.5)');
+            let lineColor = isRecruiter ? 'rgba(157, 78, 221, ' : (isLightMode ? 'rgba(124, 58, 237, ' : 'rgba(59, 130, 246, ');
+            let scrollY = window.scrollY * 0.05;
+
+            nodes.forEach(node => {
+                node.x += node.vx; node.y += node.vy;
+                if(node.x < 0 || node.x > width) node.vx *= -1;
+                let drawY = node.y - scrollY;
+                drawY = ((drawY % height) + height) % height;
+                ctx.fillStyle = nodeColor;
+                ctx.beginPath(); ctx.arc(node.x, drawY, node.size, 0, Math.PI * 2); ctx.fill();
+
+                nodes.forEach(other => {
+                    let otherDrawY = ((other.y - scrollY) % height + height) % height;
+                    let dist = Math.hypot(node.x - other.x, drawY - otherDrawY);
+                    if(dist < 150) {
+                        ctx.strokeStyle = lineColor + (1 - dist/150) * 0.2 + ')';
+                        ctx.lineWidth = 0.5;
+                        ctx.beginPath(); ctx.moveTo(node.x, drawY); ctx.lineTo(other.x, otherDrawY); ctx.stroke();
+                    }
+                });
+            });
+            requestAnimationFrame(drawCanvas);
+        }
+        window.addEventListener('resize', initCanvas);
+        initCanvas(); drawCanvas();
+
+        /* ==========================================================================
+           3. HIGH-PERFORMANCE CUSTOM CURSOR & MAGNETIC BUTTONS
+           ========================================================================== */
+        const cursor = document.getElementById('cursor');
+        const cursorGlow = document.getElementById('cursor-glow');
+        let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+        let glowX = mouseX, glowY = mouseY;
+        window.addEventListener('mousemove', e => {
+            mouseX = e.clientX; mouseY = e.clientY;
+            cursor.style.left = mouseX + 'px'; cursor.style.top = mouseY + 'px';
+        });
+        function animateCursorGlow() {
+            glowX += (mouseX - glowX) * 0.2; glowY += (mouseY - glowY) * 0.2;
+            cursorGlow.style.left = glowX + 'px'; cursorGlow.style.top = glowY + 'px';
+            requestAnimationFrame(animateCursorGlow);
+        }
+        animateCursorGlow();
+
+        document.querySelectorAll('.magnetic').forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+            });
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = `translate(0px, 0px)`;
+            });
+        });
+        document.querySelectorAll('.tilt-card').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left; const y = e.clientY - rect.top;
+                const centerX = rect.width / 2; const centerY = rect.height / 2;
+                const rotateX = ((y - centerY) / centerY) * -5;
+                const rotateY = ((x - centerX) / centerX) * 5;
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)`;
+            });
+        });
+
+        const progressBar = document.getElementById('progress-bar');
+        window.addEventListener('scroll', () => {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            progressBar.style.width = (winScroll / height) * 100 + "%";
+        });
+
+        /* ==========================================================================
+           4. SCROLL REVEAL
+           ========================================================================== */
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) { entry.target.classList.add('active'); }
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        /* ==========================================================================
+           5. TYPEWRITER EFFECT
+           ========================================================================== */
+        const phrases = ["Software Engineer", "AI Builder", "Competitive Programmer", "Open Source Contributor"];
+        let phraseIdx = 0, charIdx = 0, isDeleting = false;
+        const typeEl = document.getElementById('hero-typewriter');
+        function typeWriter() {
+            const currentPhrase = phrases[phraseIdx];
+            if (isDeleting) charIdx--; else charIdx++;
+            typeEl.textContent = currentPhrase.substring(0, charIdx);
+            
+            let speed = isDeleting ? 50 : 100;
+            if (!isDeleting && charIdx === currentPhrase.length) { speed = 2000; isDeleting = true; }
+            else if (isDeleting && charIdx === 0) { isDeleting = false; phraseIdx = (phraseIdx + 1) % phrases.length; speed = 500; }
+            setTimeout(typeWriter, speed);
+        }
+        setTimeout(typeWriter, 1000);
+
+        /* ==========================================================================
+           6. ADVANCED AI ASSISTANT (Comprehensive Knowledge Base)
+           ========================================================================== */
+        const aiOrb = document.getElementById('ai-orb');
+        const aiPanel = document.getElementById('ai-panel');
+        const aiInput = document.getElementById('ai-input');
+        const aiLog = document.getElementById('ai-chat-log');
+        const aiGreeting = document.getElementById('ai-greeting');
+        
+        const greetingText = "Hi! I'm Parth's AI assistant. Ask me anything about his projects, skills, education, or professional experience!";
+        
+        let synthVoices = [];
+        window.speechSynthesis.onvoiceschanged = () => { synthVoices = window.speechSynthesis.getVoices(); };
+        
+        aiOrb.addEventListener('click', () => { 
+            aiPanel.classList.toggle('active'); 
+            if(aiPanel.classList.contains('active')) {
+                aiInput.focus();
+                if(aiGreeting.textContent === 'Initializing...') {
+                    aiGreeting.textContent = greetingText;
+                    speakText(greetingText);
+                }
+            }
+        });
+
+        const intentEngine = [
+            {
+                keywords: ['who is parth', 'tell me about parth', 'about parth', 'who are you', 'introduce yourself', 'about'],
+                response: "Hi, I'm Parth Mulik. I'm a software engineer, AI Builder, Competitive Programmer, and Open Source Contributor. I'm passionate about building scalable software systems, AI-powered applications, and real-time platforms. I combine strong problem-solving skills with practical engineering experience through projects, internships, hackathons, and open-source contributions."
+            },
+            {
+                keywords: ['study', 'studying', 'degree', 'university', 'college', 'education', 'cgpa', 'grades'],
+                response: "Parth is pursuing a Bachelor of Technology in Electronics and Telecommunication at VIT Bhopal University. He currently maintains a CGPA of 9.20."
+            },
+            {
+                keywords: ['languages', 'programming languages', 'language'],
+                response: "His primary programming languages are C++, Python, JavaScript, and SQL."
+            },
+            {
+                keywords: ['backend', 'back end', 'server'],
+                response: "Yes. Backend development is one of Parth's strongest areas. He has experience with Node.js, Express.js, REST APIs, PostgreSQL, Redis, WebSockets, and real-time applications."
+            },
+            {
+                keywords: ['frontend', 'front end', 'ui'],
+                response: "Parth works with React.js, HTML, CSS, and responsive user interface development."
+            },
+            {
+                keywords: ['database', 'databases', 'db'],
+                response: "He has experience with PostgreSQL, MySQL, and Redis."
+            },
+            {
+                keywords: ['tools', 'devops', 'deployment'],
+                response: "Parth regularly uses Docker, Git, Linux, Postman, and modern software development workflows."
+            },
+            {
+                keywords: ['technologies', 'tech stack', 'what does he know', 'skills'],
+                response: "Parth works with C++, Python, JavaScript, SQL, React.js, Node.js, Express.js, PostgreSQL, MySQL, Redis, Docker, Git, Linux, REST APIs, Socket.io, and WebSockets."
+            },
+            {
+                keywords: ['strongest skills', 'best at', 'strengths', 'strength'],
+                response: "His strengths include backend development, problem solving, system building, API design, real-time applications, data structures and algorithms, AI-powered solutions, adaptability, fast learning, teamwork, and leadership."
+            },
+            {
+                keywords: ['api testing platform', 'api platform', 'api project'],
+                response: "The API Testing Platform is a developer-focused platform that supports multiple HTTP methods, authentication, custom headers, query parameters, request history, API collections, and reusable workflows to simplify API development and testing."
+            },
+            {
+                keywords: ['collaborative code editor', 'code editor', 'real-time editor', 'real time editor'],
+                response: "The Collaborative Code Editor is a real-time collaborative coding platform where multiple users can join shared rooms and edit code simultaneously using WebSockets and Socket.io."
+            },
+            {
+                keywords: ['ai compliance checker', 'compliance checker', 'proud of', 'best project'],
+                response: "The AI Compliance Checker is an AI-powered platform that processes regulatory and contract documents, extracts clauses, validates compliance, identifies risks, and generates automated reports. It is the project he is most proud of because it combines AI, automation, document processing, risk detection, and real-world business value."
+            },
+            {
+                keywords: ['projects', 'built', 'build', 'portfolio'],
+                response: "Some of Parth's key projects include an API Testing & Request Management Platform, a Real-Time Collaborative Code Editor, and an AI-Powered Regulatory Compliance Checker."
+            },
+            {
+                keywords: ['intern', 'internship', 'infosys', 'experience', 'worked'],
+                response: "Parth worked as an AI Intern at Infosys Springboard. He worked on AI-driven workflows, debugging, testing, feature enhancements, optimization, and improving application reliability and performance."
+            },
+            {
+                keywords: ['ai experience', 'artificial intelligence', 'machine learning', 'ml'],
+                response: "Through his internship and AI Compliance Checker project, Parth has worked with AI workflows, document analysis, automation, compliance validation, and intelligent reporting systems."
+            },
+            {
+                keywords: ['hackathon', 'hackathons', 'won', 'win'],
+                response: "Parth has won 2 hackathons while competing against hundreds of teams."
+            },
+            {
+                keywords: ['competitive programming', 'cp', 'problems', 'leetcode', 'codechef', 'dsa'],
+                response: "He has solved more than 300 algorithmic problems across platforms such as LeetCode and CodeChef."
+            },
+            {
+                keywords: ['certification', 'certifications', 'certified', 'oracle'],
+                response: "Parth holds the Oracle Cloud Infrastructure AI Foundations Associate certification."
+            },
+            {
+                keywords: ['open source', 'gssoc', 'ssoc', 'contribute', 'contribution'],
+                response: "Yes. Parth was selected as a contributor for GirlScript Summer of Code (GSSoC) and Social Summer of Code (SSOC)."
+            },
+            {
+                keywords: ['leadership', 'lead', 'leader', 'organize', 'club', 'insights', 'marathi'],
+                response: "He served as Resource Lead at Insights Club and Technical Lead at Marathi Club, helping organize and lead technical initiatives."
+            },
+            {
+                keywords: ['hire', 'different', 'stand out', 'suit', 'roles', 'why hire'],
+                response: "Parth combines strong problem-solving ability, full-stack development experience, AI project exposure, competitive programming discipline, leadership experience, and a strong academic record. Roles like Software Engineer, Backend Developer, Full Stack Developer, AI/ML Intern, and Platform Engineer are strong matches for his skill set."
+            },
+            {
+                keywords: ['philosophy', 'goals', 'future', 'learning', 'enjoy', 'open to opportunities'],
+                response: "Parth's development philosophy is to build useful systems, solve meaningful problems, continuously learn, and focus on creating value. He particularly enjoys working with Node.js, Python, PostgreSQL, Docker, AI systems, APIs, and real-time applications. He is open to opportunities and aims to become a highly skilled software engineer working on impactful products."
+            },
+            {
+                keywords: ['contact', 'email', 'reach', 'number', 'call', 'message'],
+                response: "You can contact Parth through the Contact section of this portfolio or through his professional profiles and email."
+            },
+            {
+                keywords: ['resume', 'cv', 'download'],
+                response: "You can download Parth's resume using the Resume button available throughout the website."
+            },
+            {
+                keywords: ['github', 'linkedin', 'coding profiles', 'geeksforgeeks', 'profiles', 'links'],
+                response: "You can access Parth's GitHub, LinkedIn, LeetCode, CodeChef, and GeeksforGeeks profiles through the links available in the Contact and Coding Profiles sections of the portfolio."
+            },
+            {
+                keywords: ['hi', 'hello', 'hey', 'greetings', 'morning', 'evening'],
+                response: "Hello! I'm Parth's AI Assistant. You can ask me about his education, skills, projects, internships, achievements, and more!"
+            }
+        ];
+
+        const fallbackResponse = "I'm not sure about that. My knowledge is currently limited to information available in Parth's portfolio. Feel free to explore the Projects, Skills, Experience, Achievements, or Contact sections for more information.";
+
+        function getAIResponse(userQuery) {
+            const lowerQ = userQuery.toLowerCase();
+            
+            // Priority Exact Match Check for Introductions
+            if (lowerQ.includes('who is parth') || lowerQ.includes('tell me about parth') || lowerQ.includes('introduce yourself')) {
+                return intentEngine[0].response;
+            }
+
+            // Loop through knowledge base
+            for (const intent of intentEngine) {
+                if (intent.keywords.some(kw => lowerQ.includes(kw))) {
+                    return intent.response;
+                }
+            }
+            // Strict Fallback (No Hallucination)
+            return fallbackResponse;
+        }
+
+        function speakText(text) {
+            if('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                if (synthVoices.length === 0) synthVoices = window.speechSynthesis.getVoices();
+                const maleVoice = synthVoices.find(voice => 
+                    voice.name.toLowerCase().includes('male') || 
+                    voice.name.toLowerCase().includes('guy') || 
+                    voice.name.toLowerCase().includes('david') || 
+                    voice.name.toLowerCase().includes('daniel')
+                );
+                if (maleVoice) { utterance.voice = maleVoice; }
+                utterance.rate = 1.0; 
+                utterance.pitch = 0.85; 
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        aiInput.addEventListener('keydown', (e) => {
+            if(e.key === 'Enter' && aiInput.value.trim() !== '') {
+                const query = aiInput.value.trim();
+                aiLog.innerHTML += `<div class="ai-msg user">${query}</div>`;
+                aiInput.value = '';
+                
+                setTimeout(() => {
+                    const response = getAIResponse(query);
+                    aiLog.innerHTML += `<div class="ai-msg bot">${response}</div>`;
+                    aiLog.scrollTop = aiLog.scrollHeight;
+                    speakText(response);
+                }, 500);
+            }
+        });
+
+        /* ==========================================================================
+           7. RECRUITER MODE TOGGLE
+           ========================================================================== */
+        function toggleRecruiterMode() {
+            document.body.classList.toggle('recruiter-mode');
+            const btn = document.querySelector('.recruiter-btn');
+            if(document.body.classList.contains('recruiter-mode')) {
+                btn.textContent = "Default Mode";
+                speakText("Cinematic tech mode engaged. Colors switched to high-contrast cyan and purple.");
+            } else {
+                btn.textContent = "Cinematic Mode";
+                speakText("Default mode restored. Highlighting core engineering metrics with an Amber aesthetic.");
+            }
+        }
+    </script>
+</body>
+</html>
